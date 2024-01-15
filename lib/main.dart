@@ -39,21 +39,29 @@ class MyAppState extends ChangeNotifier {
     await client.use('dev', 'main');
     // authenticate with user and pass
     await client.signin(user: 'root', pass: 'root');
-
-    //add('hello');
-    //get();
   }
 
   void add(String note) async {
     final data = {'name': userName, 'note': note};
-    var addition = await client.create('notes', data);
-    get();
+    await client.create('notes', data);
     notifyListeners();
   }
 
   void get() async {
     notes = await client.query('SELECT * FROM notes WHERE name==\'$userName\'');
     notifyListeners();
+  }
+
+  String name() {
+    return userName;
+  }
+
+  void login(String name) {
+    userName = name;
+  }
+
+  void logout() {
+    userName = '';
   }
 
   void search(String query) {}
@@ -91,15 +99,16 @@ class LoginPage extends StatelessWidget {
           ElevatedButton(
             child: const Text('Login'),
             onPressed: () {
-              appState.userName = myController.text;
+              appState.login(myController.text);
               myController.clear();
-              print('${appState.userName} logged in');
+              print('${appState.name()} logged in');
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => NotesPage()),
               );
             },
           ),
+          Spacer(),
         ]),
       ),
     );
@@ -115,6 +124,7 @@ class _NotesPageState extends State<NotesPage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    appState.get();
     print(appState.notes);
     return Scaffold(
       appBar: AppBar(
@@ -122,6 +132,10 @@ class _NotesPageState extends State<NotesPage> {
       ),
       body: Center(
         child: Column(children: [
+          const SearchBar(
+            hintText: 'Search...',
+          ),
+          Spacer(),
           // for (var pair in appState.notes)
           //   ListTile(
           //     leading: Icon(Icons.favorite),
@@ -140,12 +154,13 @@ class _NotesPageState extends State<NotesPage> {
           ),
           ElevatedButton(
             onPressed: () {
-              appState.userName = '';
-              print('${appState.userName} signed out');
+              print('${appState.name()} logged out');
+              appState.logout();
               Navigator.pop(context);
             },
-            child: const Text('Sign out'),
+            child: const Text('Logout'),
           ),
+          Spacer(),
         ]),
       ),
     );
@@ -195,9 +210,11 @@ class CreatePage extends StatelessWidget {
           ElevatedButton(
             child: const Text('Discard'),
             onPressed: () {
+              myController.clear();
               Navigator.pop(context);
             },
           ),
+          Spacer(),
         ]),
       ),
     );
