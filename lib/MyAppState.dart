@@ -27,13 +27,14 @@ class MyAppState extends ChangeNotifier {
     prefs = await SharedPreferences.getInstance();
     final String? user = prefs.getString('userName');
     if (user != null) userName = user;
-    print('starting user is $userName');
+    get();
+    //print('starting user is $userName');
   }
 
   void add(String note) async {
     final data = {'name': userName, 'note': note};
-    print('adding $userName with $note');
     await client.create('notes', data);
+    get();
     notifyListeners();
   }
 

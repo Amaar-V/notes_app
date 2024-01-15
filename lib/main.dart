@@ -15,7 +15,7 @@ void main() async {
 
 final String? user = prefs.getString('userName');
 final GoRouter _router = GoRouter(
-  initialLocation: user!=null?'/':(user==''?'/':'/notes'),
+  initialLocation: user!=null?(user==''?'/':'/notes'):'/',
   routes: <RouteBase>[
     GoRoute(
       path: '/',

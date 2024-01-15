@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'MyAppState.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});
@@ -18,9 +17,8 @@ class NotesPage extends StatelessWidget {
       myController.dispose();
     }
 
-    appState.get();
-
-    if (appState.notes != null) {
+    final notes = appState.notes;
+    if (notes != null && notes[0]['result'].runtimeType != String) {
       return Scaffold(
         appBar: AppBar(
           title: const Text('Notes'),
@@ -49,9 +47,9 @@ class NotesPage extends StatelessWidget {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  for (var obj in appState.notes[0]['result'])
-                    ListTile(
-                      title: Text(obj['note']),
+                  for (var obj in notes[0]['result'])
+                    Card(
+                      child: Center(child: Text(obj['note'])),
                     ),
                 ],
               ),
@@ -64,7 +62,7 @@ class NotesPage extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                print('${appState.name()} logged out');
+                //print('${appState.name()} logged out');
                 appState.logout();
                 context.go('/');
               },
@@ -113,7 +111,7 @@ class NotesPage extends StatelessWidget {
               },
               child: const Text('Logout'),
             ),
-            Spacer(),
+            const Spacer(),
           ]),
         ),
       );

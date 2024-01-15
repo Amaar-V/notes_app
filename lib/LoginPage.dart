@@ -37,12 +37,12 @@ class LoginPage extends StatelessWidget {
             onPressed: () {
               appState.login(myController.text);
               myController.clear();
-              print('${appState.name()} logged in');
+              //print('${appState.name()} logged in');
               appState.get();
               context.go('/notes');
             },
           ),
-          Spacer(),
+          const Spacer(),
         ]),
       ),
     );
