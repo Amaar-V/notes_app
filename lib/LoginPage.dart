@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'NotesPage.dart';
 import 'MyAppState.dart';
 
-
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -11,6 +10,7 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final myController = TextEditingController();
     var appState = context.watch<MyAppState>();
+    final user = appState.userName;
 
     @override
     void dispose() {
@@ -18,6 +18,13 @@ class LoginPage extends StatelessWidget {
       myController.dispose();
     }
 
+    //TODO fix this
+    // if (user != '') {
+    //   Navigator.push(
+    //     context,
+    //     MaterialPageRoute(builder: (context) => const NotesPage()),
+    //   );
+    // }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),

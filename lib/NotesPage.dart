@@ -3,22 +3,40 @@ import 'package:provider/provider.dart';
 import 'CreatePage.dart';
 import 'MyAppState.dart';
 
-
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final myController = TextEditingController();
     var appState = context.watch<MyAppState>();
+
+    @override
+    void dispose() {
+      // Clean up the controller when the widget is disposed.
+      myController.dispose();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notes'),
       ),
       body: Center(
         child: Column(children: [
-          const SearchBar(
-            hintText: 'Search...',
-          ),
+          Row(
+            children: [
+              SearchBar(
+                controller: myController,
+                hintText: 'Search...',
+                leading: const Icon(Icons.search),
+              ),
+              ElevatedButton(onPressed: () {
+                if(myController.text != '') {
+                    appState.search(myController.text);
+                  }
+              }, child: const Icon(Icons.search),)
+            ],
+           ),
           const Spacer(),
           Center(
             child: ListView(
