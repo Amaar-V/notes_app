@@ -17,8 +17,8 @@ class MyApp extends StatelessWidget {
         title: 'Notes App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme:
-              ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 82, 0, 224)),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 82, 0, 224)),
         ),
         home: LoginPage(),
       ),
@@ -28,11 +28,14 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var userName = '';
-  var client;
+  final client = SurrealDB('ws://localhost:8000/rpc')..connect();
   var notes;
 
-  void main(List<String> args) async {
-    client = SurrealDB('ws://localhost:8000/rpc')..connect();
+  MyAppState() {
+    main();
+  }
+
+  void main() async {
     await client.wait();
     // use test namespace and test database
     // TODO: create surreal ql file
@@ -102,9 +105,10 @@ class LoginPage extends StatelessWidget {
               appState.login(myController.text);
               myController.clear();
               print('${appState.name()} logged in');
+              appState.get();
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => NotesPage()),
+                MaterialPageRoute(builder: (context) => const NotesPage()),
               );
             },
           ),
@@ -115,17 +119,12 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class NotesPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() => _NotesPageState();
-}
+class NotesPage extends StatelessWidget {
+  const NotesPage({super.key});
 
-class _NotesPageState extends State<NotesPage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    appState.get();
-    print(appState.notes);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notes'),
@@ -135,14 +134,18 @@ class _NotesPageState extends State<NotesPage> {
           const SearchBar(
             hintText: 'Search...',
           ),
-          Spacer(),
-          // for (var pair in appState.notes)
-          //   ListTile(
-          //     leading: Icon(Icons.favorite),
-          //     title: Text(
-          //       pair.asLowerCase,
-          //     ),
-          //   ),
+          const Spacer(),
+          Center(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (var obj in appState.notes[0]['result'])
+                  ListTile(
+                    title: Text(obj['note']),
+                  ),
+              ],
+            ),
+          ),
           ElevatedButton(
             child: const Text('New note'),
             onPressed: () {
@@ -188,11 +191,11 @@ class CreatePage extends StatelessWidget {
       body: Center(
         child: Column(children: [
           Expanded(
-            child: TextField(
+            child: TextFormField(
               controller: myController,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: 'Enter note',
+                labelText: 'Enter note',
               ),
             ),
           ),
@@ -200,21 +203,18 @@ class CreatePage extends StatelessWidget {
             child: const Text('Create'),
             onPressed: () {
               appState.add(myController.text);
-              myController.clear();
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NotesPage()),
-              );
+              appState.get();
+              Navigator.pop(context);
             },
           ),
           ElevatedButton(
             child: const Text('Discard'),
             onPressed: () {
-              myController.clear();
+              appState.get();
               Navigator.pop(context);
             },
           ),
-          Spacer(),
+          const Spacer(),
         ]),
       ),
     );
