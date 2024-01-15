@@ -15,8 +15,6 @@ class MyAppState extends ChangeNotifier {
   void main() async {
     await client.wait();
     // use test namespace and test database
-    // TODO: create surreal ql file
-    // TODO: add search features
     await client.use('dev', 'main');
     // authenticate with user and pass
     await client.signin(user: 'root', pass: 'root');
@@ -61,7 +59,6 @@ class MyAppState extends ChangeNotifier {
   void search(String query) async {
     notes = await client.query(
         'SELECT name,note FROM notes WHERE name==\'$userName\' AND note @0@ \'$query\'');
-    print(notes);
     notifyListeners();
   }
 }

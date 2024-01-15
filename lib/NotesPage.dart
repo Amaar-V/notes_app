@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'CreatePage.dart';
+import 'package:go_router/go_router.dart';
 import 'MyAppState.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotesPage extends StatelessWidget {
   const NotesPage({super.key});
@@ -17,58 +18,105 @@ class NotesPage extends StatelessWidget {
       myController.dispose();
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notes'),
-      ),
-      body: Center(
-        child: Column(children: [
-          Row(
-            children: [
-              SearchBar(
-                controller: myController,
-                hintText: 'Search...',
-                leading: const Icon(Icons.search),
-              ),
-              ElevatedButton(onPressed: () {
-                if(myController.text != '') {
-                    appState.search(myController.text);
-                  }
-              }, child: const Icon(Icons.search),)
-            ],
-           ),
-          const Spacer(),
-          Center(
-            child: ListView(
-              shrinkWrap: true,
+    appState.get();
+
+    if (appState.notes != null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Notes'),
+        ),
+        body: Center(
+          child: Column(children: [
+            Row(
               children: [
-                for (var obj in appState.notes[0]['result'])
-                  ListTile(
-                    title: Text(obj['note']),
-                  ),
+                SearchBar(
+                  controller: myController,
+                  hintText: 'Search...',
+                  leading: const Icon(Icons.search),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (myController.text != '') {
+                      appState.search(myController.text);
+                    }
+                  },
+                  child: const Icon(Icons.search),
+                )
               ],
             ),
-          ),
-          ElevatedButton(
-            child: const Text('New note'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CreatePage()),
-              );
-            },
-          ),
-          ElevatedButton(
-            onPressed: () {
-              print('${appState.name()} logged out');
-              appState.logout();
-              Navigator.pop(context);
-            },
-            child: const Text('Logout'),
-          ),
-          Spacer(),
-        ]),
-      ),
-    );
+            const Spacer(),
+            Center(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (var obj in appState.notes[0]['result'])
+                    ListTile(
+                      title: Text(obj['note']),
+                    ),
+                ],
+              ),
+            ),
+            ElevatedButton(
+              child: const Text('New note'),
+              onPressed: () {
+                context.go('/create');
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                print('${appState.name()} logged out');
+                appState.logout();
+                context.go('/');
+              },
+              child: const Text('Logout'),
+            ),
+            Spacer(),
+          ]),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Notes'),
+        ),
+        body: Center(
+          child: Column(children: [
+            Row(
+              children: [
+                SearchBar(
+                  controller: myController,
+                  hintText: 'Search...',
+                  leading: const Icon(Icons.search),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (myController.text != '') {
+                      appState.search(myController.text);
+                    }
+                  },
+                  child: const Icon(Icons.search),
+                )
+              ],
+            ),
+            const Spacer(),
+            ElevatedButton(
+              child: const Text('New note'),
+              onPressed: () {
+                context.go('/create');
+              },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                print('${appState.name()} logged out');
+                appState.logout();
+                context.go('/');
+              },
+              child: const Text('Logout'),
+            ),
+            Spacer(),
+          ]),
+        ),
+      );
+    }
   }
 }

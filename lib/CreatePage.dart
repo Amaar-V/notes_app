@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'MyAppState.dart';
 
 
@@ -37,14 +38,14 @@ class CreatePage extends StatelessWidget {
             onPressed: () {
               appState.add(myController.text);
               appState.get();
-              Navigator.pop(context);
+              context.go('/notes');
             },
           ),
           ElevatedButton(
             child: const Text('Discard'),
             onPressed: () {
               appState.get();
-              Navigator.pop(context);
+              context.go('/notes');
             },
           ),
           const Spacer(),
